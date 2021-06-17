@@ -1,0 +1,145 @@
+﻿@model IEnumerable<Entidad.ProyectoEmpleadoCE>
+@{
+    ViewBag.Title = "AsignarProyecto";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Asignar Proyectos</h2>
+<hr />
+<div class="form-horizontal" id="divAsignar">
+    <div class="form-group">
+        <label class="control-label col-md-2">Proyecto</label>
+        <div class="col-md-4">
+            <select class="form-control" id="Proyectoid" name="Proyectoid">
+                <option value="">Seleccionar Proyecto ...</option>
+            </select>
+        </div>
+
+        <label class="control-label col-md-1">Empleado</label>
+        <div class="col-md-4">
+            <select class="form-control" id="Empleadoid" name="Empleadoid">
+                <option value="">Seleccionar Empleado ...</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-offset-3 col-md-4">
+            <br />
+            <button type="button" class="btn btn-primary btn-block" onclick="AsignarProyecto()">
+                <i class="glyphicon glyphicon-hand-up"></i>Asignar
+            </button>
+        </div>
+    </div>
+    <hr />
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-5">
+            <table class="table table-bordered table-condensed table-striped">
+                <thead>
+                    <tr>
+                        <th>Proyecto</th>
+                        <th>Empleado</th>
+                        <th class="text-center">Fecha Alta</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.NombreProyecto</td>
+                            <td>@item.NombreCompleto</td>
+                            <th class="text-center">@item.FechaAlta.ToShortDateString()</th>
+                            <th class="text-center">
+                                <a href="javascript:;" class="btn btn-danger btn-xs" onclick="EliminarAsignacion(@item.ProyectoId,@item.EmpleadoId)">
+                                    <i class="glyphicon glyphicon-trash"></i>
+                                </a>
+                            </th>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+@section scripts{
+    <script>
+        getProyectos();
+        getEmpleados();
+        function AsignarProyecto() {
+            var proyectoid = $("#Proyectoid").val();
+            var empleadoid = $("#Empleadoid").val();
+
+            if (proyectoid == "" || empleadoid == "") {
+                alert("Debe escoger un proyecto y un empleado");
+                return;
+            }
+
+            $.confirm({
+                title: 'Agregar Asignacion !',
+                content: '?Estas Seguro de Agregar esta Asignacion?',
+                buttons: {
+                    Confirmar: function () {
+                        LoadingOverlayShow("#divAsignar");
+                        $.ajax({
+                            url: "/proyecto/asignarproyecto",
+                            type: "post",
+                            data: { proyectoid, empleadoid }
+                        }).done(function (response) {
+                            LoadingOverlayHide("#divAsignar");
+                            console.log(response);
+                            if (response.ok) {
+                                alert("asignacion creada Correctamente");
+                                window.location = response.toRedirect;
+                            } else {
+                                alert(response.msg);
+                            }
+                        }).fail(function (jqXHR, textStatus, errorThrown) {
+                            LoadingOverlayHide("#divAsignar");
+                        });
+                    },
+                    Cancelar: function () {
+
+                    }
+                }
+            });
+
+        }
+
+        function EliminarAsignacion(proyectoid, empleadoid) {
+            $.confirm({
+                title: 'Eliminar Asignacion !',
+                content: '?Estas Seguro de Eliminar esta Asignacion?',
+                buttons: {
+                    Confirmar: function () {
+                        LoadingOverlayShow("#divAsignar");
+                        $.ajax({
+                            url: "/proyecto/eliminarasignacion",
+                            type: "post",
+                            data: { proyectoid, empleadoid }
+                        }).done(function (response) {
+                            LoadingOverlayHide("#divAsignar");
+                            console.log(response);
+                            if (response.ok) {
+                                alert("Asignacion Eliminada Correctamente");
+                                window.location = response.toRedirect;
+                            } else {
+                                alert(response.msg);
+                            }
+                        }).fail(function (jqXHR, textStatus, errorThrown) {
+                            LoadingOverlayHide("#divAsignar");
+                        });
+                    },
+                    Cancelar: function () {
+
+                    }
+                }
+            });
+
+        }
+
+
+
+    </script>
+}
+

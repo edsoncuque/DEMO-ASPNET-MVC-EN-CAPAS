@@ -1,0 +1,103 @@
+﻿@model IEnumerable<Entidad.Proyecto>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Lista de Proyectos</h2>
+
+<p>
+    <!--Ejemplo boton de Html puro utilizando url.action de Razor-->
+    <a class="btn btn-primary" href="@Url.Action("Crear","Proyecto")"><i class="glyphicon glyphicon-plus"></i>  Crear Nuevo</a>
+</p>
+<table class="table" id="tablaproy">
+    <thead>
+        <tr>
+            <th>
+                <label>Nombre del Proyecto</label>
+            </th>
+            <th>
+                <label>Fecha de Inicio</label>
+            </th>
+            <th>
+                Fecha de Finalizacion
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @item.NombreProyecto
+                </td>
+                <td>
+                    @item.Fechainicio.ToShortDateString()
+                </td>
+                <td>
+                    @item.Fechafin.ToShortDateString()
+                </td>
+                <td>
+                    <a class="btn btn-primary btn-xs" title="Editar" href="@Url.Action("Editar","Proyecto", new { id=item.Proyectoid})">
+                        <i class="glyphicon glyphicon-edit"></i>
+                    </a>
+                    <a class="btn btn-info btn-xs" title="Detalle" href="@Url.Action("Detalles","Proyecto", new { id=item.Proyectoid})">
+                        <i class="glyphicon glyphicon-pencil"></i>
+                    </a>
+                    <a class="btn btn-danger btn-xs" onclick="EliminarProyecto(@item.Proyectoid)" title="Eliminar">
+                        <i class="glyphicon glyphicon-trash"></i>
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section scripts{
+    <script>
+        $('#tablaproy').DataTable({
+            "pageLength": 5,
+            lengthMenu: [5, 10, 20, 50, 100, 200, 500],
+            autoWidth: false,
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
+            }
+        });
+
+        function EliminarProyecto(id) {
+            $.confirm({
+                title: 'Eliminar Proyecto!',
+                content: 'Estas Seguro de Eliminar este Proyecto?',
+                buttons: {
+                    si: function () {
+                        LoadingOverlayShow("#tablaproy");
+                        $.ajax({
+                            url: "/proyecto/eliminar",
+                            type: "Post",
+                            data: { identificador: id}
+                        }).done(function (response) {
+                            LoadingOverlayHide("#tablaproy");
+                            console.log(response);
+                            if (response.ok) {
+                                alert("Proyecto Eliminado Correctamente");
+                                window.location = response.toRedirect;
+                            } else {
+                                alert(response.msg);
+                            }
+                        }).fail(function (jqXHR, textStatus, errorThrown) {
+                            LoadingOverlayHide("#tablaproy");
+                        });
+                    },
+                    no: function () {
+                       // $.alert('Canceled!');
+                    },
+                }
+            });
+        }
+
+
+    </script>
+}

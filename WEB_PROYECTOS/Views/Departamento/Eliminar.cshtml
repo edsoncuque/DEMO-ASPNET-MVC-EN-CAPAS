@@ -1,0 +1,31 @@
+﻿@model Entidad.Departamento
+
+@{
+    ViewBag.Title = "Eliminar";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h3>Estas Seguro de Eliminar Esto?</h3>
+<div>
+    <h4>Eliminar Departamento</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            Departamento:
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.NombreDepartamento)
+        </dd>
+
+    </dl>
+
+    @using (Html.BeginForm("Eliminar","Departamento",FormMethod.Post)) {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Delete" class="btn btn-default" /> |
+            @Html.ActionLink("Regresar", "Index")
+        </div>
+    }
+</div>

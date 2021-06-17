@@ -1,0 +1,114 @@
+﻿@model IEnumerable<Entidad.EmpleadoCE>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Lista de Empleados</h2>
+
+<p>
+    <!--Ejemplo boton de Html puro utilizando url.action de Razor-->
+    <a class="btn btn-primary" href="@Url.Action("Crear","Empleado")"><i class="glyphicon glyphicon-plus"></i>  Crear Nuevo</a>
+</p>
+<table class="table" id="tblemployee">
+    <thead>
+        <tr>
+            <th>
+                <label>Nombres y Apellidos</label>
+            </th>
+            <th>
+                <label>Email</label>
+            </th>
+            <th>
+                <label>Direccion</label>
+            </th>
+            <th>
+                <label>Celular</label>
+            </th>
+            <th>
+                <label>Departamento</label>
+            </th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @item.NombreCompleto
+                </td>
+                <td>
+                    @item.Email
+                </td>
+                <td>
+                    @item.Direccion
+                </td>
+                <td>
+                    @item.Celular
+                </td>
+                <td>
+                    @item.NombreDepartamento
+                </td>
+                <td>
+                    <a class="btn btn-primary btn-xs" title="Editar" href="@Url.Action("Editar","Empleado", new { id=item.Empleadoid})">
+                        <i class="glyphicon glyphicon-edit"></i>
+                    </a>
+                    <a class="btn btn-info btn-xs" title="Detalle" href="@Url.Action("Detalles","Empleado", new { id=item.Empleadoid})">
+                        <i class="glyphicon glyphicon-pencil"></i>
+                    </a>
+                    <a class="btn btn-danger btn-xs" onclick="EliminarProyecto(@item.Empleadoid)" title="Eliminar">
+                        <i class="glyphicon glyphicon-trash"></i>
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section scripts{
+    <script>
+        $('#tablaproy').DataTable({
+            "pageLength": 5,
+            lengthMenu: [5, 10, 20, 50, 100, 200, 500],
+            autoWidth: false,
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
+            }
+        });
+
+        function EliminarProyecto(id) {
+            $.confirm({
+                title: 'Eliminar Empleado!',
+                content: 'Estas Seguro de Eliminar este Empleado?',
+                buttons: {
+                    si: function () {
+                        LoadingOverlayShow("#tblemployee");
+                        $.ajax({
+                            url: "/empleado/eliminar",
+                            type: "Post",
+                            data: { identificador: id }
+                        }).done(function (response) {
+                            LoadingOverlayHide("#tblemployee");
+                            console.log(response);
+                            if (response.ok) {
+                                alert("Empleado Eliminado Correctamente");
+                                window.location = response.toRedirect;
+                            } else {
+                                alert(response.msg);
+                            }
+                        }).fail(function (jqXHR, textStatus, errorThrown) {
+                            LoadingOverlayHide("#tblemployee");
+                        });
+                    },
+                    no: function () {
+                        // $.alert('Canceled!');
+                    },
+                }
+            });
+        }
+
+
+    </script>
+}

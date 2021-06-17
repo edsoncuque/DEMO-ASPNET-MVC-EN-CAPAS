@@ -1,0 +1,119 @@
+﻿@model Entidad.EmpleadoCE
+
+@{
+    ViewBag.Title = "Editar";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<form id="frmEmpleado" action="@Url.Action("Editar","Empleado")" method="post">
+
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4>Editar Empleado</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.Empleadoid)
+
+
+        <div class="form-group">
+            <label class="control-label col-md-2">Nombres</label>
+            <div class="col-md-10">
+                <input type="text" class="form-control" id="Nombres" name="Nombres" value="@Model.Nombres" placeholder="Ingrese Nombre del Empleado" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2">Apellidos</label>
+            <div class="col-md-10">
+                <input type="text" class="form-control" id="Apellidos" name="Apellidos" value="@Model.Apellidos" placeholder="Ingrese Apellido del Empleado" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2">Correo Electronico</label>
+            <div class="col-md-10">
+                <input type="text" class="form-control" id="Email" name="Email" value="@Model.Email" placeholder="Ingrese Email del Empleado" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2">Direccion</label>
+            <div class="col-md-10">
+                <input type="text" class="form-control" id="Direccion" name="Direccion" value="@Model.Direccion" placeholder="Ingrese Direccion del Empleado" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2">Celuar</label>
+            <div class="col-md-10">
+                <input type="text" class="form-control" id="Celular" name="Celular" value="@Model.Celular" placeholder="Ingrese Celular del Empleado" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2">Departamento</label>
+            <div class="col-md-10">
+                <select class="form-control" id="Departamentoid" name="Departamentoid">
+                    <option value="">Seleccionar Departamento ...</option>
+                </select>
+
+            </div>
+        </div>
+
+        
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Guardar Empleado" class="btn btn-primary" />
+            </div>
+        </div>
+    </div>
+</form>
+<div>
+    <a class="btn btn-default" href="@Url.Action("Index","Empleado")">Regresar</a>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+        // obtener todos los departamentos
+        getDepartamentos(function (result) {
+            $("#Departamentoid").val("@Model.Departamentoid");
+        });
+
+        $("#frmEmpleado").submit(function (event) {
+            event.preventDefault();
+
+            var dptoid = $("#Departamentoid").val();
+            if (dptoid == "") {
+                alert("Debe Seleccionar un Departamento");
+                return;
+            }
+
+            var post_url = $(this).attr("action");
+            var request_method = $(this).attr("method");
+            var form_data = $(this).serializeArray();
+            console.log(form_data);
+            // se manda justo antes de la peticion Ajax
+
+            LoadingOverlayShow("#frmEmpleado");
+            $.ajax({
+                url: post_url,
+                type: request_method,
+                data: form_data
+            }).done(function (response) {
+                LoadingOverlayHide("#frmEmpleado");
+                console.log(response);
+                if (response.ok) {
+                    alert("Empleado Modificado Correctamente");
+                    window.location = response.toRedirect;
+                } else {
+                    alert(response.msg);
+                }
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                LoadingOverlayHide("#frmEmpleado");
+            });
+        });
+    </script>
+}

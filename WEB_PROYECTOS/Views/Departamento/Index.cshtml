@@ -1,0 +1,50 @@
+﻿@model IEnumerable<Entidad.Departamento>
+
+@{
+    ViewBag.Title = "Listado de Departamentos";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Departamentos</h2>
+
+<p>
+    <a class="btn btn-primary" href="@Url.Action("Crear","Departamento")"><i class="glyphicon glyphicon-plus"></i> Crear Departamento</a>
+    <!--Html.ActionLink("Crear Departamento", "Crear", "Departamento")-->
+</p>
+<table class="table" id="tabladeptos">
+    <thead>
+        <tr>
+            <th>
+                Nombre de Departamento
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.NombreDepartamento)
+                </td>
+                <td>
+                    <a class="btn btn-primary btn-xs" title="Editar" href="@Url.Action("Editar","Departamento", new { id=item.Departamentoid})"><i class="glyphicon glyphicon-edit"></i></a>
+                    <a class="btn btn-info btn-xs" title="Detalles" href="@Url.Action("GetDepartamento","Departamento",new { id=item.Departamentoid})"><i class="glyphicon glyphicon-pencil"></i></a>
+                    <a class="btn btn-danger btn-xs" title="Eliminar" href="@Url.Action("Eliminar","Departamento",new { id=item.Departamentoid})"><i class="glyphicon glyphicon-trash"></i></a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@section scripts{
+    <script>
+        $('#tabladeptos').DataTable({
+            "pageLength": 5,
+            lengthMenu: [5, 10, 20, 50, 100, 200, 500],
+            autoWidth: false,
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
+            }
+        });
+    </script>
+}
